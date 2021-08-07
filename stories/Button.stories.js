@@ -1,39 +1,16 @@
 import React from "react";
-import { Button } from "./Button";
+import { User } from "./Button";
 
 export default {
-  title: "Example/Button",
-  component: Button,
+  title: "Example/User",
+  component: User,
   parameters: {
-    myAddonParameter: `
-<MyComponent boolProp scalarProp={1} complexProp={{ foo: 1, bar: '2' }}>
-  <SomeOtherComponent funcProp={(a) => a.id} />
-</MyComponent>
-`,
-  },
+    initialUser: {
+      isLoading: true
+    }
+  }
 };
 
-const Template = (args) => <Button {...args} />;
+const Template = (args) => <User {...args} />;
 
 export const Primary = Template.bind({});
-Primary.args = {
-  primary: true,
-  label: "Button",
-};
-
-export const Secondary = Template.bind({});
-Secondary.args = {
-  label: "Button",
-};
-
-export const Large = Template.bind({});
-Large.args = {
-  size: "large",
-  label: "Button",
-};
-
-export const Small = Template.bind({});
-Small.args = {
-  size: "small",
-  label: "Button",
-};
