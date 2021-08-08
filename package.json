@@ -1,6 +1,6 @@
 {
   "name": "storybook-addon-next-auth0",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Managed userProvider decorator for nextjs-auth0",
   "keywords": [
     "storybook-addons",
