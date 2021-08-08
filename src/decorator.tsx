@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import addons, { StoryContext, useEffect, useParameter } from "@storybook/addons";
 import UserProvider from './Provider'
 
-export const withGlobals = (StoryFn: any, context: StoryContext) => {
+export const decorator = (StoryFn: any, context: StoryContext) => {
   const initialUser = useParameter('initialUser', { isLoading: false })
 
   const [user, setUser] = useState(initialUser);
