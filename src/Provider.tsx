@@ -1,15 +1,11 @@
-import React, { ReactElement, useState, useEffect, createContext, useContext } from 'react';
+import React, { ReactElement } from 'react';
 import { UserContext, UserProviderProps, UserProfile } from '@auth0/nextjs-auth0';
 
-type UserProviderState = {
+export type UserProviderState = {
   user?: UserProfile;
-  error?: Error;
+  error?: string;
   isLoading: boolean;
 };
-
-const initialDefaultUser: UserProviderState = {
-  isLoading: false
-}
 
 const checkSession = async () => {};
 
@@ -20,6 +16,6 @@ export default ({
   const { user, error, isLoading } = initialUser as UserProviderState
 
   return (
-    <UserContext.Provider value={{ user, error, isLoading, checkSession }}>{children}</UserContext.Provider>
+    <UserContext.Provider value={{ user, error: error && new Error(error), isLoading, checkSession }}>{children}</UserContext.Provider>
   );
 };

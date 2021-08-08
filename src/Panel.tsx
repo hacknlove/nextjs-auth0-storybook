@@ -1,71 +1,251 @@
-import React, { useEffect } from "react";
-import { AddonPanel } from "@storybook/components";
+import React, { useEffect, useState } from "react";
+import { AddonPanel, TableWrapper, BooleanControl, DateControl  } from "@storybook/components";
 import { Form } from '@storybook/components';
 import addons from "@storybook/addons";
+import type { UserProviderState } from './Provider';
+import { styled } from '@storybook/theming';
 
 interface PanelProps {
   active: boolean;
 }
 
-function setUser (user: any) {
-  const channel = addons.getChannel()
+const FieldSet = styled.div(() => ({
+  margin: '1rem',
+}));
 
-  channel.emit('nextjs-auth0/setUser', user)
+interface userFieldType {
+  name: string;
+  type?: string;
 }
 
+const user: UserProviderState = { isLoading: true }
+
+const initialUser: UserProviderState = { isLoading: true }
+
+const fields: Array<userFieldType> = [
+  {
+    name: 'email',
+  },
+  {
+    name: 'email_verified',
+    type: 'checkbox'
+  },
+  {
+    name: 'nickname',
+  },
+  {
+    name: 'picture',
+  },
+  {
+    name: 'sub',
+  },
+  {
+    name: 'updated_at',
+    type: 'date'
+  }
+]
+
 export const Panel: React.FC<PanelProps> = (props) => {
+  const [user, setUser] = useState(initialUser);
 
-  const user: any  = { isLoading: false }
+  const isLoggedIn = Boolean(user.user)
+  const hasError = Boolean(user.error)
 
-  const isLoggedId = Boolean(user.user)
+  useEffect(() => {
+    const channel = addons.getChannel()
+    channel.on('nextjs-auth0/setInitial', setUser)
+    return () => {
+      channel.off('nextjs-auth0/setInitial', setUser)
+    }
+  }, [])
 
-  console.log(user)
+  function setUserHandler (user: any) {
+    const channel = addons.getChannel()
+ 
+    setUser(user)
+
+    channel.emit('nextjs-auth0/setUser', user)
+  }
 
   return (
     <AddonPanel {...props}>
-      {/* <Form.Field label="logged in">
-        <Form.Input type="checkbox" checked={isLoggedId} onChange={event => {
-          const checked = (event.target as HTMLInputElement).checked
-          console.log(checked)
-          if (checked) {
-            setUser({
-              ...user,
-              user: {
-                email: 'foo@bar.com',
-                email_verified: true,
-                name: 'Foo Bar',
-                nickname: 'Foo',
-                picture: 'https://picsum.photos/200',
-                sub: 'mock:usersub',
-                updated_at: '2021-08-06T12:08:21.218Z',
-              },
-            })
-          } else {
-            setUser({
-              user: null,
-              isLoading: false,
-              error: null
-            })
-          }
-        }}/>
-      </Form.Field>
+      <FieldSet>
+        <h2>General:</h2>
+        <TableWrapper>
+          <thead className="docblock-argstable-head">
+            <tr>
+              <th>Name</th>
+              <th>Control</th> 
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <strong>Logged in</strong>
+              </td>
+              <td>
+                <BooleanControl value={isLoggedIn} name="is logged in" onChange={checked => {
+                if (checked) {
+                  setUserHandler({
+                    ...user,
+                    user: {
+                      email: 'foo@bar.com',
+                      email_verified: true,
+                      name: 'Foo Bar',
+                      nickname: 'Foo',
+                      picture: 'https://picsum.photos/200',
+                      sub: 'mock:usersub',
+                      updated_at: '2021-08-06T12:08:21.218Z',
+                    },
+                  })
+                } else {
+                  setUserHandler({
+                    ...user,
+                    user: null,
+                  })
+                }
+              }}/>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <strong>Has error</strong>
+              </td>
+              <td>
+                <BooleanControl value={hasError} name="Has error" onChange={checked => {
+                  if (checked) {
+                    setUserHandler({
+                      ...user,
+                      error: 'Some error description'
+                    })
+                  } else {
+                    setUserHandler({
+                      ...user,
+                      error: null
+                    })
+                  }
+                }}/>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <strong>is Loading</strong>
+              </td>
+              <td>
+                <BooleanControl value={user.isLoading} name="is loading" onChange={checked => {
+                  setUserHandler({
+                    ...user,
+                    isLoading: checked
+                  })
+                }}/>
+              </td>
+            </tr>
+          </tbody>
+        </TableWrapper>
+      </FieldSet>
 
-      {isLoggedId && (
-        <Form.Field label="email">
-          <Form.Input
-            value={user.user.email}
-            onChange={event => {
-              setUser({
-                ...user,
-                user: {
-                  email: (event.target as HTMLInputElement).value
-                },
-              })
-            }} 
-          />
-        </Form.Field>
-      )} */}
-
+      {
+        isLoggedIn && (
+          <FieldSet>
+            <h2>User</h2>
+            <TableWrapper>
+              <thead className="docblock-argstable-head">
+                <tr>
+                  <th>Name</th>
+                  <th>Control</th> 
+                </tr>
+              </thead>
+              <tbody>
+                {fields.map(
+                  ({name, type = 'text'}: userFieldType ) => (
+                    <tr key={name}>
+                      <td><strong>{name}</strong></td>
+                      <td>
+                        {
+                          type === 'checkbox'
+                            ? (
+                              <BooleanControl value={user.user[name] as boolean} name={name} onChange={checked => {
+                                setUserHandler({
+                                  ...user,
+                                  user: {
+                                      ...user.user,
+                                      [name]: checked
+                                    },
+                                  })
+                              }}/>
+                            )
+                            : type === 'date' 
+                            ? (
+                              <DateControl
+                                name={name}
+                                value={new Date(user.user[name] as string)}
+                                onChange={date => {
+                                  setUserHandler({
+                                    ...user,
+                                    user: {
+                                      ...user.user,
+                                      [name]: new Date(date).toISOString()
+                                    },
+                                  })
+                                }}
+                              />
+                            )
+                            : (
+                              <Form.Input
+                                value={user.user[name] as string}
+                                type={type}
+                                onChange={event => {
+                                  setUserHandler({
+                                    ...user,
+                                    user: {
+                                      ...user.user,
+                                      [name]: (event.target as HTMLInputElement).value
+                                    },
+                                  })
+                                }} 
+                              />
+                            )
+                          }
+                        </td>
+                      </tr>
+                    )
+                  )}
+              </tbody>
+            </TableWrapper>
+          </FieldSet>
+        )
+      }
+      {
+        hasError && (
+          <FieldSet>
+            <h2>Error</h2>
+            <TableWrapper>
+              <thead className="docblock-argstable-head">
+                <tr>
+                  <th>Name</th>
+                  <th>Control</th> 
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>error</strong></td>
+                  <td>
+                    <Form.Input
+                      value={user.error}
+                      onChange={event => {
+                        setUserHandler({
+                          ...user,
+                          error: (event.target as HTMLInputElement).value
+                        })
+                      }} 
+                    />
+                  </td>
+                </tr>
+              </tbody>
+            </TableWrapper>
+          </FieldSet>
+        )
+      }
     </AddonPanel>
   );
 };

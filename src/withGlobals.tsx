@@ -9,6 +9,11 @@ export const withGlobals = (StoryFn: any, context: StoryContext) => {
 
   useEffect(() => {
     const channel = addons.getChannel();
+    channel.emit('nextjs-auth0/setInitial', user)
+  }, [initialUser])
+
+  useEffect(() => {
+    const channel = addons.getChannel();
     channel.on('nextjs-auth0/setUser', setUser)
     return () => {
       channel.off('nextjs-auth0/setUser', setUser)

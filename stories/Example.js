@@ -1,7 +1,7 @@
 import React from "react";
 import { useUser } from '@auth0/nextjs-auth0';
 
-export function User () {
+export function UserPrint () {
   const user = useUser();
 
   return (

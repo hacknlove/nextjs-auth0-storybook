@@ -1,17 +1,17 @@
 {
-  "name": "storybook-addon-kit",
-  "version": "0.0.0",
-  "description": "everything you need to build a Storybook addon",
+  "name": "storybook-addon-next-auth0",
+  "version": "1.0.0",
+  "description": "Managed userProvider decorator for nextjs-auth0",
   "keywords": [
     "storybook-addons",
-    "style",
-    "test"
+    "auth0",
+    "nextjs"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/storybookjs/storybook-addon-kit"
+    "url": "https://github.com/storybookjs/storybook-addon-next-auth0"
   },
-  "author": "winkerVSbecks",
+  "author": "Antonio Fernández Porrúa",
   "license": "MIT",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -86,12 +86,9 @@
     "access": "public"
   },
   "storybook": {
-    "displayName": "Addon Kit",
+    "displayName": "Nextjs auth0",
     "supportedFrameworks": [
-      "react",
-      "vue",
-      "angular"
-    ],
-    "icon": "https://user-images.githubusercontent.com/321738/63501763-88dbf600-c4cc-11e9-96cd-94adadc2fd72.png"
+      "react"
+    ]
   }
 }
